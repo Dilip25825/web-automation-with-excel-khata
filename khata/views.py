@@ -162,7 +162,7 @@ def delete_customer(request, customer_id):
             # SweetAlert is warning ko automatically pakad lega aur dikha dega
             messages.warning(
                 request, 
-                f"Is grahak ko delete nahi kiya ja sakta! Abhi ₹{abs(net_balance):.2f} ka hisaab baki hai."
+                f"Is Customers ko delete nahi kiya ja sakta! Abhi ₹{abs(net_balance):.2f} ka hisaab baki hai."
             )
             return redirect('dashboard')
             
