@@ -109,6 +109,23 @@
             });
         });
     </script>
+    <script>
+    // 10 minute (600,000 ms) ka idle timer
+    let idleTime = 0;
+    const idleInterval = setInterval(timerIncrement, 60000); // Har 1 min check karega
+
+    function timerIncrement() {
+        idleTime = idleTime + 1;
+        if (idleTime > 9) { // 10 minute ho gaye
+            window.location.href = "{% url 'logout' %}"; // Logout view par bhej do
+        }
+    }
+    // Agar user mouse hilaaye ya click kare, toh timer reset ho jaye
+    window.onload = resetTimer;
+    window.onmousemove = resetTimer;
+    window.onkeypress = resetTimer;
+    function resetTimer() { idleTime = 0; }
+</script>
 </body>
 
 </html>
