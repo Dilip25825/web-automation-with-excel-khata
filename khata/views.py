@@ -12,7 +12,7 @@ from django.template.loader import get_template
 from xhtml2pdf import pisa
 from django.http import HttpResponse
 from .models import ShopProfile
-
+from django.core.paginator import Paginator #
 
 @login_required
 def dashboard(request):
@@ -478,3 +478,28 @@ def shop_profile(request):
         # Kuch dikkat aane par error message show karein
         messages.error(request, f"Profile kholne mein samasya aayi: {str(e)}")
         return redirect('dashboard')
+    
+
+@login_required
+def report_page(request):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    
+    # Transactions filter karna
+    transactions = Transaction.objects.filter(customer__user=request.user).order_by('-date')
+    
+    # Date wise filter logic
+    if start_date and end_date:
+        transactions = transactions.filter(date__range=[start_date, end_date])
+    
+    # Pagination logic (20 entries per page)
+    paginator = Paginator(transactions, 10) 
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'transactions': page_obj, # Ab yahan sirf 20 entries aayengi
+        'start_date': start_date,
+        'end_date': end_date,
+    }
+    return render(request, 'khata/report.html', context)

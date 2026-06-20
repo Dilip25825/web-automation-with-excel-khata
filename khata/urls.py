@@ -17,4 +17,6 @@ urlpatterns = [
     path('edit-customer/<str:b64_id>/', views.edit_customer, name='edit_customer'),
     path('edit-transaction/<str:b64_trans_id>/', views.edit_transaction, name='edit_transaction'),
     path('settings/', views.shop_profile, name='shop_profile'),
+    path('report/', views.report_page, name='report_page'),
+    path('customer/<str:customer_id>/', views.customer_detail, name='customer_detail'),
 ]
