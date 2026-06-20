@@ -142,7 +142,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-warning">
-                <h5 class="modal-title fw-bold text-dark" id="interestModalLabel">Byaaj (Interest) Calculate Karein</h5>
+                <h5 class="modal-title fw-bold text-dark" id="interestModalLabel">Byaaj Calculation</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 
             </div>
@@ -153,7 +153,7 @@
 
                     <!-- Principal Amount (Bakaaya Rakam) - Read Only -->
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Bakaaya Rakam (Principal)</label>
+                        <label class="form-label fw-semibold">Principal</label>
                         <input type="number" id="principalAmt" class="form-control bg-light"
                             value="{{ net_balance|stringformat:'.2f' }}" readonly>
                     </div>
@@ -161,7 +161,7 @@
                     <div class="row">
                         <!-- Rate per month -->
                         <div class="col-6 mb-3">
-                            <label class="form-label fw-semibold">Dar (Rate % / Mahina)</label>
+                            <label class="form-label fw-semibold">Rate % / Month</label>
                             <input type="number" step="0.01" name="rate" id="interestRate" class="form-control"
                                 placeholder="Jaise 2" required value="2">
                         </div>
@@ -169,7 +169,7 @@
 
                         <!-- Time in months -->
                         <div class="col-6 mb-3">
-                            <label class="form-label fw-semibold">Samay (Mahine)</label>
+                            <label class="form-label fw-semibold">Time in Month</label>
                             <!-- value me backend se calculated mahine aayenge, par ise manually badla (edit) bhi ja sakta hai -->
                             <input type="number" step="0.01" name="months" id="interestMonths" class="form-control"
                                 placeholder="Kitne mahine?" value="{{ auto_months }}" required>
@@ -180,21 +180,21 @@
 
                     <!-- Auto-calculated Interest Amount -->
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-danger">Kool Byaaj (Total Interest)</label>
+                        <label class="form-label fw-bold text-danger">Total Byaaj</label>
                         <input type="number" step="0.01" name="interest_amount" id="totalInterest"
                             class="form-control fw-bold text-danger" required readonly>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Tareekh (Date)</label>
+                        <label class="form-label fw-semibold">Date</label>
                         <input type="date" name="date" class="form-control" value="{% now 'Y-m-d' %}" required>
                     </div>
 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
                     <!-- Form submit button -->
-                    <button type="submit" class="btn btn-danger fw-bold">Hisaab Mein Jodein</button>
+                    <button type="submit" class="btn btn-success fw-bold">Hisaab Mein Jodein</button>
                 </div>
             </form>
         </div>

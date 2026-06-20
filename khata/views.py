@@ -218,7 +218,7 @@ def customer_detail(request, customer_id):
         auto_months = 0
         # Agar koi transaction mojood hai, toh sabse aakhri date nikalenge
         if transactions.exists():
-            last_trans = transactions.first() 
+            last_trans = transactions.last() 
             
             # FIX: Purani entries (datetime) ko sirf 'date' mein badalne ka logic
             last_date = last_trans.date
@@ -358,30 +358,30 @@ def add_interest(request, b64_id):
             
             trans_date = parse_date(date_str)
             
-            # Custom remarks banayein taaki samajh aaye ki ye entry vyaaj ki hai
-            remarks = f"Vyaaj (Interest): {rate}% dar se {months} mahine ka"
+            # Custom remarks banayein taaki samajh aaye ki ye entry Byaaj ki hai
+            remarks = f"Byaaj (Interest): {rate}% dar se {months} mahine ka"
 
-            # Duplicate Check: Check karein ki same date pe same vyaaj pehle toh nahi joda gaya
+            # Duplicate Check: Check karein ki same date pe same Byaaj pehle toh nahi joda gaya
             if Transaction.objects.filter(customer=customer, amount=interest_amount, trans_type='GIVEN', date=trans_date, remarks=remarks).exists():
-                messages.warning(request, "Vyaaj ki yeh entry is tareekh par pehle se lag chuki hai! (Duplicate Error)")
+                messages.warning(request, "Byaaj ki yeh entry is tareekh par pehle se lag chuki hai! (Duplicate Error)")
                 return redirect('customer_detail', customer_id=customer.id)
 
             # Agar duplicate nahi hai, toh nayi entry save karein
             new_trans = Transaction(
                 customer=customer,
                 amount=interest_amount,
-                trans_type='GIVEN',  # Vyaaj udhaar mein judta hai, isliye 'GIVEN'
+                trans_type='GIVEN',  # Byaaj udhaar mein judta hai, isliye 'GIVEN'
                 remarks=remarks,
                 date=trans_date
             )
             new_trans.save()
-            messages.success(request, f"₹{interest_amount} ka vyaaj khate mein safaltapoorvak jod diya gaya!")
+            messages.success(request, f"₹{interest_amount} ka Byaaj khate mein safaltapoorvak jod diya gaya!")
             
         return redirect('customer_detail', customer_id=customer.id)
         
     except Exception as e:
         # Error aane par handle karein aur dashboard par wapas bhej dein
-        messages.error(request, f"Vyaaj jodne mein samasya aayi: {str(e)}")
+        messages.error(request, f"Byaaj jodne mein samasya aayi: {str(e)}")
         return redirect('dashboard')
     
 @login_required
