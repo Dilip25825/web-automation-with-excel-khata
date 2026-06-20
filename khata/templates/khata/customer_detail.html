@@ -95,6 +95,7 @@
                                 <th>Vivran</th>
                                 <th class="text-end text-danger">Maine Diye</th>
                                 <th class="text-end text-success pe-4">Mujhe Mile</th>
+                                <th>Balance</th>
                                 <th>Edit</th>
                                 <th>Action</th>
                             </tr>
@@ -112,8 +113,13 @@
                                 <td class="text-end fw-bold text-success pe-4">
                                     {% if trans.trans_type == 'GOT' %}₹{{ trans.amount }}{% else %}—{% endif %}
                                 </td>
+                                <td
+                                    class="text-end fw-bold {% if trans.running_balance >= 0 %}text-danger{% else %}text-success{% endif %}">
+                                    ₹{% if trans.running_balance < 0 %} {{ trans.running_balance|stringformat:"d"|slice:"1:" }} {% else %} {{ trans.running_balance }} {% endif %} </td>
                                 <td>
-                                    <a href="{% url 'edit_transaction' trans.b64_id %}" class="btn btn-sm btn-outline-secondary px-2 py-0 me-1" title="Edit Entry">✏️</a>
+                                    <a href="{% url 'edit_transaction' trans.b64_id %}"
+                                        class="btn btn-sm btn-outline-secondary px-2 py-0 me-1"
+                                        title="Edit Entry">✏️</a>
                                 </td>
                                 <td>
                                     <form action="{% url 'delete_transaction' trans.b64_id %}" method="POST"

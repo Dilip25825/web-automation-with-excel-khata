@@ -234,6 +234,18 @@ def customer_detail(request, customer_id):
                 auto_months = round(days_passed / 30.0, 1)
         # ---> NAYA LOGIC YAHAN KHATAM <---
 
+            # Security ke liye har transaction ki ID ko Base64 me encode karke template me bhejenge
+            running_balance = 0 # Balance shuruat se 0 rakhein
+            for t in transactions:
+                t.b64_id = base64.b64encode(str(t.id).encode('utf-8')).decode('utf-8')
+                
+                # Balance Calculation
+                if t.trans_type == 'GIVEN':
+                    running_balance += t.amount
+                else:
+                    running_balance -= t.amount
+                
+                t.running_balance = running_balance # Har row ke liye current balance set kiya
 
         # ---> WHATSAPP REMINDER LOGIC SHURU <---
         whatsapp_url = ""
