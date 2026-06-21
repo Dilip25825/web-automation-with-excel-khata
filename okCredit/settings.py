@@ -11,25 +11,21 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
-import os
-from dotenv import load_dotenv
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-dotenv_path = os.path.join(BASE_DIR, '.env')
-load_dotenv(dotenv_path)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
-
+SECRET_KEY = 'django-insecure-xgzte-@$2wwercfz+++xt08e*))2vn&@pfqw2jx7wj-5-x&p5x'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['https://ddelwash8.pythonanywhere.com/']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -127,9 +123,3 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.file'
 # Ya agar aap chahte hain ki server restart hote hi data delete ho jaye:
 SESSION_FILE_PATH = None
 SESSION_SAVE_EVERY_REQUEST = True
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SECURE_HSTS_SECONDS = 31536000  # 1 saal (Seconds mein)
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
