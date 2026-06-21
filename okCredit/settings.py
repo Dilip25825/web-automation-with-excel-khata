@@ -123,3 +123,8 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.file'
 # Ya agar aap chahte hain ki server restart hote hi data delete ho jaye:
 SESSION_FILE_PATH = None
 SESSION_SAVE_EVERY_REQUEST = True
+
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+SECURE_HSTS_SECONDS = 0
