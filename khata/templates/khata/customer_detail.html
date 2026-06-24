@@ -90,6 +90,7 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
+                                <th>Sr</th>
                                 <th class="ps-4">Date</th>
                                 <th>Vivran</th>
                                 <th class="text-end text-danger">Maine Diye</th>
@@ -102,6 +103,7 @@
                         <tbody>
                             {% for trans in transactions %}
                             <tr>
+                                <td>{{forloop.counter}}</td>
                                 <td class="ps-4 text-muted small">{{ trans.date|date:"d M Y" }}</td>
                                 <td class="fw-semibold text-secondary">{{ trans.remarks|default:"—" }}</td>
 
