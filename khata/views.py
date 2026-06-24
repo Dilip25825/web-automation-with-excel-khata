@@ -16,70 +16,59 @@ from django.core.paginator import Paginator #
 
 @login_required
 def dashboard(request):
-    # Error aane par app crash hone se rokne ke liye try block (Error Handling)
     try:
-        # Base list: User ke saare grahak
+        # Base list
         customers = Customer.objects.filter(user=request.user).order_by('name')
         
-        # URL se 'search' aur 'filter' parameters nikalna
         search_query = request.GET.get('search', '').strip()
         filter_type = request.GET.get('filter', 'all')
         
-        # Search Logic: Agar user ne kuch type kiya hai, toh filter lagayein
         if search_query:
-            # Q object ka use karke Naam (name) YA Phone (phone) dono me search karna (icontains = case-insensitive match)
             customers = customers.filter(
                 Q(name__icontains=search_query) | Q(phone__icontains=search_query)
             ).order_by('name')
         
+        # 1. Total Calculations (Poore customers par, pagination se pehle)
         total_lene_hain = 0  
         total_dene_hain = 0  
-        filtered_customers = []
         
-        # Har grahak ka balance nikalna aur status ke hisaab se filter karna
-        for customer in customers:
-            transactions = Transaction.objects.filter(customer=customer)
+        for cust in customers:
+            trans = Transaction.objects.filter(customer=cust)
+            net = sum(t.amount for t in trans if t.trans_type == 'GIVEN') - sum(t.amount for t in trans if t.trans_type == 'GOT')
+            if net > 0: total_lene_hain += net
+            elif net < 0: total_dene_hain += abs(net)
+
+        # 2. Filter logic (Dashboard ke cards ke liye)
+        final_list = []
+        for cust in customers:
+            trans = Transaction.objects.filter(customer=cust)
+            net = sum(t.amount for t in trans if t.trans_type == 'GIVEN') - sum(t.amount for t in trans if t.trans_type == 'GOT')
             
-            given = sum(t.amount for t in transactions if t.trans_type == 'GIVEN')
-            got = sum(t.amount for t in transactions if t.trans_type == 'GOT')
+            if filter_type == 'lene' and net <= 0: continue
+            if filter_type == 'dene' and net >= 0: continue
             
-            net_balance = given - got
-            
-            # Sirf overall dashboard ke calculation ke liye
-            if net_balance > 0:
-                total_lene_hain += net_balance
-            elif net_balance < 0:
-                total_dene_hain += abs(net_balance)
-                
-            # Grahak ke object me balance set karna
-            customer.balance = net_balance
-            customer.abs_balance = abs(net_balance) 
-            
-            # Cards wale Filter Logic
-            if filter_type == 'lene' and net_balance <= 0:
-                continue 
-            if filter_type == 'dene' and net_balance >= 0:
-                continue 
-                
-            # filtered_customers.append(customer)
-            # Grahak ki ID ko Base64 me encode karna taaki URL secure rahe
-            customer.b64_id = base64.b64encode(str(customer.id).encode('utf-8')).decode('utf-8')
-            
-            filtered_customers.append(customer)
+            cust.balance = net
+            cust.abs_balance = abs(net)
+            cust.b64_id = base64.b64encode(str(cust.id).encode('utf-8')).decode('utf-8')
+            final_list.append(cust)
+
+        # 3. Pagination (Limit 15 per page)
+        paginator = Paginator(final_list, 10)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        
         context = {
-            'customers': filtered_customers, 
+            'customers': page_obj, 
             'total_lene_hain': total_lene_hain,
             'total_dene_hain': total_dene_hain,
             'current_filter': filter_type,
-            'search_query': search_query, # Template me search text wapas dikhane ke liye
+            'search_query': search_query,
         }
         return render(request, 'khata/dashboard.html', context)
         
     except Exception as e:
-        messages.error(request, f"Dashboard load karne me error aayi: {str(e)}")
+        messages.error(request, f"Dashboard load karne me error: {str(e)}")
         return render(request, 'khata/error.html')
-    
-
 @login_required
 def add_customer(request):
     if request.method == 'POST':
