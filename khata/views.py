@@ -14,6 +14,7 @@ from django.http import HttpResponse
 from .models import ShopProfile
 from django.core.paginator import Paginator #
 
+
 @login_required
 def dashboard(request):
     try:
@@ -69,6 +70,8 @@ def dashboard(request):
     except Exception as e:
         messages.error(request, f"Dashboard load karne me error: {str(e)}")
         return render(request, 'khata/error.html')
+    
+
 @login_required
 def add_customer(request):
     if request.method == 'POST':
