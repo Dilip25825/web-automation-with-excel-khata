@@ -181,6 +181,7 @@ def delete_customer(request, customer_id):
 def customer_detail(request, customer_id):
     # Error Handling ke liye try block
     try:
+        
         customer = get_object_or_404(Customer, id=customer_id, user=request.user)
         
         if request.method == 'POST':
@@ -401,6 +402,7 @@ def download_ledger_pdf(request, b64_id):
     # Error aane par program crash hone se bachane ke liye try block
     try:
         # Base64 string se actual ID nikalne ke liye DecodeBase64 ka logic
+        
         decoded_id_str = base64.b64decode(b64_id).decode('utf-8')
         actual_customer_id = int(decoded_id_str)
         
@@ -478,28 +480,61 @@ def shop_profile(request):
         # Kuch dikkat aane par error message show karein
         messages.error(request, f"Profile kholne mein samasya aayi: {str(e)}")
         return redirect('dashboard')
-    
+
 
 @login_required
 def report_page(request):
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
     
-    # Transactions filter karna
+    # 1. Base transactions
     transactions = Transaction.objects.filter(customer__user=request.user).order_by('-date')
     
-    # Date wise filter logic
+    # 2. Date wise filter (pehle filter karein)
     if start_date and end_date:
         transactions = transactions.filter(date__range=[start_date, end_date])
     
-    # Pagination logic (20 entries per page)
-    paginator = Paginator(transactions, 10) 
+    # 3. Pagination (limit 10 ya 20)
+    paginator = Paginator(transactions, 15) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
+    # 4. Loop sirf page_obj par chalayein (taaki sirf dikhne wale data par kaam ho)
+    for trans in page_obj:
+        # Customer ID ko secure karke encode karein
+        trans.customer.b64_id = base64.b64encode(str(trans.customer.id).encode('utf-8')).decode('utf-8')
+    
     context = {
-        'transactions': page_obj, # Ab yahan sirf 20 entries aayengi
+        'transactions': page_obj,
         'start_date': start_date,
         'end_date': end_date,
     }
     return render(request, 'khata/report.html', context)
+
+# @login_required
+# def report_page(request):
+#     start_date = request.GET.get('start_date')
+#     end_date = request.GET.get('end_date')
+    
+#     # Transactions filter karna
+#     transactions = Transaction.objects.filter(customer__user=request.user).order_by('-date')
+
+#     for trans in transactions:
+#     # Customer ki ID ko encode karke object me store kar rahe hain
+#         trans.customer.b64_id = base64.b64encode(str(trans.customer.id).encode('utf-8')).decode('utf-8')
+    
+#     # Date wise filter logic
+#     if start_date and end_date:
+#         transactions = transactions.filter(date__range=[start_date, end_date])
+    
+#     # Pagination logic (20 entries per page)
+#     paginator = Paginator(transactions, 10) 
+#     page_number = request.GET.get('page')
+#     page_obj = paginator.get_page(page_number)
+    
+#     context = {
+#         'transactions': page_obj, # Ab yahan sirf 20 entries aayengi
+#         'start_date': start_date,
+#         'end_date': end_date,
+#     }
+#     return render(request, 'khata/report.html', context)

@@ -29,23 +29,25 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for trans in transactions %}
-                    <tr>
-                        <td>{{ trans.date|date:"d M Y" }}</td>
-                        <td>{{ trans.customer.name }}</td>
-                        <td>
-                            <span class="badge {% if trans.trans_type == 'GIVEN' %}bg-danger{% else %}bg-success{% endif %}">
-                                {{ trans.trans_type }}
-                            </span>
-                        </td>
-                        <td class="fw-bold">₹{{ trans.amount }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="4" class="text-center">Koi record nahi mila.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
+    {% for trans in transactions %}
+    <tr>
+        <td>{{ trans.date|date:"d M Y" }}</td>
+        
+      <td>
+    <a href="{% url 'customer_detail' trans.customer.id %}" class="text-decoration-none fw-bold text-primary">
+        {{ trans.customer.name }}
+    </a>
+</td>
+        
+        <td>
+            <span class="badge {% if trans.trans_type == 'GIVEN' %}bg-danger{% else %}bg-success{% endif %}">
+                {{ trans.trans_type }}
+            </span>
+        </td>
+        <td class="fw-bold">₹{{ trans.amount }}</td>
+    </tr>
+    {% endfor %}
+</tbody>
             </table>
         </div>
         <!-- Pagination Controls -->

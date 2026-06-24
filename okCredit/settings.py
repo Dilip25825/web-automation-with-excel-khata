@@ -116,6 +116,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGIN_URL = 'login'
+LOGOUT_URL = 'login'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 600
 # settings.py
