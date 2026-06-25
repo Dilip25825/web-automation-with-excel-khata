@@ -185,9 +185,9 @@ def customer_detail(request, customer_id):
             trans_date = parse_date(date_str)
             
             # Duplicate Check: Agar same grahak ka, same date pe, same amount ka same type ka len-den hai
-            if Transaction.objects.filter(customer=customer, amount=amount, trans_type=trans_type, date=trans_date).exists():
-                messages.warning(request, "Aisi same entry is tareekh par pehle se maujood hai! (Duplicate Error)")
-                return redirect('customer_detail', customer_id=customer_id)
+            # if Transaction.objects.filter(customer=customer, amount=amount, trans_type=trans_type, date=trans_date).exists():
+            #     messages.warning(request, "Aisi same entry is tareekh par pehle se maujood hai! (Duplicate Error)")
+            #     return redirect('customer_detail', customer_id=customer_id)
 
             new_trans = Transaction(
                 customer=customer,
@@ -296,11 +296,11 @@ def edit_transaction(request, b64_trans_id):
             trans_date = parse_date(date_str)
 
             # Duplicate Check: Existing entry ko chhod kar baaki check karna
-            if Transaction.objects.filter(
-                customer=trans.customer, amount=amount, trans_type=trans_type, date=trans_date
-            ).exclude(id=trans.id).exists():
-                messages.warning(request, "Same aisi len-den ki entry pehle se maujood hai!")
-                return redirect('edit_transaction', b64_trans_id=b64_trans_id)
+            # if Transaction.objects.filter(
+            #     customer=trans.customer, amount=amount, trans_type=trans_type, date=trans_date
+            # ).exclude(id=trans.id).exists():
+            #     messages.warning(request, "Same aisi len-den ki entry pehle se maujood hai!")
+            #     return redirect('edit_transaction', b64_trans_id=b64_trans_id)
 
             # Entry update karna
             trans.amount = amount
