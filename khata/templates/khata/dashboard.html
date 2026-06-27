@@ -10,6 +10,7 @@
         border: 1px solid #dee2e6;
         padding: 10px 20px;
     }
+
     .pagination .page-item.active .page-link {
         background-color: #e9ecef !important;
         border-color: #dee2e6;
@@ -18,13 +19,13 @@
     }
 </style>
 
-<div class="row mb-4">
+<div class="row mb-4 mt-3">
     <a href="?filter=lene" class="text-decoration-none col-md-6 mb-3 mb-md-0">
         <div
             class="card shadow-sm border-0 border-start border-success border-4 h-100 {% if current_filter == 'lene' %}bg-success bg-opacity-10{% endif %}">
             <div class="card-body py-4 d-flex justify-content-between align-items-center">
                 <div>
-                    <h6 class="text-muted fw-bold text-uppercase mb-2">Mujhe Lene Hain</h6>
+                    <h3 class="text-muted fw-bold text-uppercase mb-2">मुझे लेने है</h3>
                     <h2 class="mb-0 text-success fw-bold">₹{{ total_lene_hain|stringformat:".2f" }}</h2>
                 </div>
                 <div class="bg-success bg-opacity-10 p-3 rounded-circle">
@@ -39,7 +40,7 @@
             class="card shadow-sm border-0 border-start border-danger border-4 h-100 {% if current_filter == 'dene' %}bg-danger bg-opacity-10{% endif %}">
             <div class="card-body py-4 d-flex justify-content-between align-items-center">
                 <div>
-                    <h6 class="text-muted fw-bold text-uppercase mb-2">Mujhe Dene Hain</h6>
+                    <h3 class="text-muted fw-bold text-uppercase mb-2">मुझे देने है</h3>
                     <h2 class="mb-0 text-danger fw-bold">₹{{ total_dene_hain|stringformat:".2f" }}</h2>
                 </div>
                 <div class="bg-danger bg-opacity-10 p-3 rounded-circle">
@@ -51,11 +52,10 @@
 
 
 
-    <div class="row">
+    <div class="row mt-3">
 
-        <div class="col-md-4 mb-4">
+        <div class="col-md-4 mb-12">
             <div class="card shadow-sm border-0">
-
                 <div class="card-header bg-success text-white py-3">
                     <h5 class="card-title mb-0 fw-bold">Add New Customer</h5>
                 </div>
@@ -78,10 +78,6 @@
                 </div>
             </div>
         </div>
-
-
-
-
 
         <div class="col-md-8">
             <div class="card shadow-sm border-0">
@@ -183,7 +179,8 @@
                             <li class="page-item disabled"><span class="page-link">Previous</span></li>
                             {% endif %}
 
-                            <li class="page-item active"><span class="page-link bg-light text-dark border">Page {{customers.number }} of {{ customers.paginator.num_pages }}</span></li>
+                            <li class="page-item active"><span class="page-link bg-light text-dark border">Page
+                                    {{customers.number }} of {{ customers.paginator.num_pages }}</span></li>
 
                             {% if customers.has_next %}
                             <li class="page-item"><a class="page-link"

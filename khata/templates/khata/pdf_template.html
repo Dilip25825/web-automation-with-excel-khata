@@ -28,7 +28,7 @@
         {% endif %}
         <hr>
         <div class="subtitle" style="margin-top: 10px;">
-            <b>Grahak ka Naam:</b> {{ customer.name }} | <b>Phone:</b> {{ customer.phone }}
+            <b>Clinent Name:</b> {{ customer.name }} | <b>Phone:</b> {{ customer.phone }}
         </div>
     </div>
 
@@ -37,9 +37,9 @@
         <p>Kul Diye (Udhaar): Rs. {{ total_given|stringformat:".2f" }}<br>
            Kul Mile (Jama): Rs. {{ total_got|stringformat:".2f" }}</p>
         <div class="summary-box"> -->
-        <h3>Kool Hisaab Summary</h3>
-        <p>Kul Diye (Udhaar): Rs. {{ total_given|stringformat:".2f" }}<br>
-           Kul Mile (Jama): Rs. {{ total_got|stringformat:".2f" }}</p>
+        <h3>Total Transection History</h3>
+        <p>Total Credit: Rs. {{ total_given|stringformat:".2f" }}<br>
+           Total Debit (Jama): Rs. {{ total_got|stringformat:".2f" }}</p>
         
         {% if net_balance > 0 %}
             <h3 style="color: #dc3545;">
@@ -63,15 +63,17 @@
     <table>
         <thead>
             <tr>
+                <th>Sr</th>
                 <th>Date</th>
-                <th>Vivran (Remarks)</th>
-                <th class="text-right">Maine Diye</th>
-                <th class="text-right">Mujhe Mile</th>
+                <th>Discription</th>
+                <th class="text-right">Credit</th>
+                <th class="text-right">Debit</th>
             </tr>
         </thead>
         <tbody>
             {% for trans in transactions %}
             <tr>
+                <td>{{forloop.counter}}</td>
                 <td>{{ trans.date|date:"d M Y" }}</td>
                 <td>{{ trans.remarks|default:"-" }}</td>
                 <td class="text-right text-danger">{% if trans.trans_type == 'GIVEN' %}{{ trans.amount }}{% else %}-{% endif %}</td>
