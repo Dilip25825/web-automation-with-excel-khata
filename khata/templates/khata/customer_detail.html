@@ -24,17 +24,17 @@
                             (Advance){% else %}Hisaab Barabar{% endif %} </small>
                 </div>
                 <div class="card shadow-sm border-0 p-3 mb-4">
-    <div class="row text-center">
-        <div class="col-6">
-            <small class="text-muted">Total Diye</small>
-            <h5 class="text-danger">₹{{ total_given }}</h5>
-        </div>
-        <div class="col-6">
-            <small class="text-muted">Total Mile</small>
-            <h5 class="text-success">₹{{ total_got }}</h5>
-        </div>
-    </div>
-</div>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <small class="text-muted">Total Diye</small>
+                            <h5 class="text-danger">₹{{ total_given }}</h5>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Total Mile</small>
+                            <h5 class="text-success">₹{{ total_got }}</h5>
+                        </div>
+                    </div>
+                </div>
 
 
             </div>
@@ -87,15 +87,25 @@
 
     <div class="col-md-8">
         <div class="card shadow-sm border-0">
-            <div
-                class="card-header bg-success text-white fw-bold py-3 d-flex justify-content-between align-items-center">
-                <span>Ledger History</span>
+            <div class="card-header bg-success text-white py-3">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
 
-                <div>
-                    <a href="{% url 'download_ledger_pdf' encoded_id %}"
-                        class="btn btn-sm btn-light fw-bold text-danger shadow-sm">
-                        📄 PDF Download
-                    </a>
+                    <span class="fw-bold fs-5">Ledger History</span>
+
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <form method="GET" class="d-flex align-items-center gap-2">
+                            <input type="date" name="start_date" class="form-control form-control-sm"
+                                value="{{ start_date }}">
+                            <input type="date" name="end_date" class="form-control form-control-sm"
+                                value="{{ end_date }}">
+                            <button type="submit" class="btn btn-sm btn-light fw-bold text-success">Filter</button>
+                            <a href="{% url 'customer_detail' customer.id %}" class="btn btn-sm btn-danger">Reset</a>
+                        </form>
+
+                        <a href="{% url 'download_ledger_pdf' encoded_id %}?start_date={{ start_date|default:'' }}&end_date={{ end_date|default:'' }}"
+                            class="btn btn-sm btn-light fw-bold text-danger">📄 PDF Download</a>
+                    </div>
+
                 </div>
             </div>
 
@@ -130,7 +140,7 @@
                                 </td>
                                 <td
                                     class="text-end fw-bold {% if trans.running_balance >= 0 %}text-danger{% else %}text-success{% endif %}">
-                                    ₹{% if trans.running_balance < 0 %} {{ trans.running_balance|stringformat:"d"|slice:"1:" }} {% else %} {{ trans.running_balance }} {% endif %} </td>
+                                    ₹{% if trans.running_balance < 0 %} {{trans.running_balance|stringformat:"d"|slice:"1:" }} {% else %} {{trans.running_balance }} {% endif %} </td>
                                 <td>
                                     <a href="{% url 'edit_transaction' trans.b64_id %}"
                                         class="btn btn-sm btn-outline-secondary px-2 py-0 me-1"

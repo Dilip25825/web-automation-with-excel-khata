@@ -171,115 +171,85 @@ def delete_customer(request, customer_id):
 
 @login_required
 def customer_detail(request, customer_id):
-    # Error Handling ke liye try block
     try:
-        
         customer = get_object_or_404(Customer, id=customer_id, user=request.user)
-        transactions = Transaction.objects.filter(customer=customer).order_by('date')
-    
-        # Totals calculate karein
-        total_given = sum(t.amount for t in transactions if t.trans_type == 'GIVEN')
-        total_got = sum(t.amount for t in transactions if t.trans_type == 'GOT')
+        
+        # 1. Date filter lena
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+        
+        # 2. Transactions fetch karna (Order by date)
+        transactions = Transaction.objects.filter(customer=customer).order_by('date', 'id')
+        
+        # 3. Filter apply karna (Ab ye sahi jagah par hai)
+        if start_date and end_date:
+            transactions = transactions.filter(date__range=[start_date, end_date])
+        
+        # 4. Running Balance aur Totals ka calculation (Filtered transactions par)
+        running_balance = 0
+        total_given = 0
+        total_got = 0
+        
+        for t in transactions:
+            # Base64 ID for security
+            t.b64_id = base64.b64encode(str(t.id).encode('utf-8')).decode('utf-8')
+            
+            # Balance Calculation
+            if t.trans_type == 'GIVEN':
+                running_balance += t.amount
+                total_given += t.amount
+            else:
+                running_balance -= t.amount
+                total_got += t.amount
+            
+            t.running_balance = running_balance
+
+        # Net balance calculation
+        net_balance = total_given - total_got
+
+        # 5. POST Request handle karna (New Transaction)
         if request.method == 'POST':
+            # ... (Aapka existing POST logic waisa hi rahega) ...
             amount = request.POST.get('amount')
             trans_type = request.POST.get('trans_type')
             remarks = request.POST.get('remarks')
-            date_str = request.POST.get('date') # Form se tareekh nikalna
-            
+            date_str = request.POST.get('date')
             trans_date = parse_date(date_str)
             
-            # Duplicate Check: Agar same grahak ka, same date pe, same amount ka same type ka len-den hai
-            # if Transaction.objects.filter(customer=customer, amount=amount, trans_type=trans_type, date=trans_date).exists():
-            #     messages.warning(request, "Aisi same entry is tareekh par pehle se maujood hai! (Duplicate Error)")
-            #     return redirect('customer_detail', customer_id=customer_id)
-
-            new_trans = Transaction(
-                customer=customer,
-                amount=amount,
-                trans_type=trans_type,
-                remarks=remarks,
-                date=trans_date
-            )
+            new_trans = Transaction(customer=customer, amount=amount, trans_type=trans_type, remarks=remarks, date=trans_date)
             new_trans.save()
-            messages.success(request, "Len-den ka hisaab kamyabi se jod diya gaya!")
             return redirect('customer_detail', customer_id=customer_id)
 
-        # Auto Arrange Date wise: '-date' likhne se sabse nayi tareekh upar aayegi
-        transactions = Transaction.objects.filter(customer=customer).order_by('date', 'id')
-        
-        total_given = sum(t.amount for t in transactions if t.trans_type == 'GIVEN')
-        total_got = sum(t.amount for t in transactions if t.trans_type == 'GOT')
-        net_balance = total_given - total_got
-
-       # ---> NAYA LOGIC (UPDATED WITH FIX) <---
+        # 6. Interest/Auto-months calculation
         auto_months = 0
-        # Agar koi transaction mojood hai, toh sabse aakhri date nikalenge
         if transactions.exists():
             last_trans = transactions.last() 
-            
-            # FIX: Purani entries (datetime) ko sirf 'date' mein badalne ka logic
             last_date = last_trans.date
-            if hasattr(last_date, 'date'):  # Agar isme samay (time) bhi juda hai
-                last_date = last_date.date()  # Toh usme se sirf tareekh nikal lo
-            
-            # Aaj ki tareekh aur aakhri len-den ke beech kitne din nikle?
-            # Ab dono taraf sirf 'date' format hai, toh error nahi aayegi
+            if hasattr(last_date, 'date'): last_date = last_date.date()
             days_passed = (timezone.now().date() - last_date).days
-            
             if days_passed > 0:
-                # 30 din ko ek mahina mankar divide kiya, 1 decimal place tak round kiya
                 auto_months = round(days_passed / 30.0, 1)
-        # ---> NAYA LOGIC YAHAN KHATAM <---
 
-            # Security ke liye har transaction ki ID ko Base64 me encode karke template me bhejenge
-            running_balance = 0 # Balance shuruat se 0 rakhein
-            for t in transactions:
-                t.b64_id = base64.b64encode(str(t.id).encode('utf-8')).decode('utf-8')
-                
-                # Balance Calculation
-                if t.trans_type == 'GIVEN':
-                    running_balance += t.amount
-                else:
-                    running_balance -= t.amount
-                
-                t.running_balance = running_balance # Har row ke liye current balance set kiya
-
-        # ---> WHATSAPP REMINDER LOGIC SHURU <---
+        # 7. WhatsApp Logic
         whatsapp_url = ""
-        # Agar udhaar (net_balance) 0 se zyada hai, tabhi reminder link banega
         if net_balance > 0:
-            # Grahak ke liye ek badhiya sa message banayein
-            message = f"नमस्ते  {customer.name} जी,\nआपका बकाया उधार ₹{net_balance:.2f} बाकी है, कृपया समय पर भुगतान करे.\nधन्यवाद!\nदिलीप डेलवास"
-            
-            # Message ko URL format me encode karna zaroori hai (jaise space ki jagah %20 ho jana)
+            message = f"नमस्ते {customer.name} जी, आपका बकाया उधार ₹{net_balance:.2f} बाकी है, कृपया समय पर भुगतान करे.\nधन्यवाद!"
             encoded_message = urllib.parse.quote(message)
-            
-            # Phone number filter karna (sirf numbers rakhna)
             phone_number = ''.join(filter(str.isdigit, customer.phone))
-            
-            # Agar number 10 digit ka hai aur aage 91 nahi laga, toh 91 jod dein (India code)
-            if len(phone_number) == 10:
-                phone_number = "91" + phone_number
-                
-            # Final WhatsApp API URL
+            if len(phone_number) == 10: phone_number = "91" + phone_number
             whatsapp_url = f"https://wa.me/{phone_number}?text={encoded_message}"
-        # ---> WHATSAPP LOGIC KHATAM <---
             
-        encoded_id = base64.b64encode(str(customer.id).encode('utf-8')).decode('utf-8')
-        
-        # Security ke liye har transaction ki ID ko Base64 me encode karke template me bhejenge
-        for t in transactions:
-            t.b64_id = base64.b64encode(str(t.id).encode('utf-8')).decode('utf-8')
-        
         context = {
             'customer': customer,
             'transactions': transactions,
             'net_balance': net_balance,
-            'encoded_id': encoded_id,
+            'encoded_id': base64.b64encode(str(customer.id).encode('utf-8')).decode('utf-8'),
             'auto_months': auto_months,
             'whatsapp_url': whatsapp_url,
             'total_given': total_given,
             'total_got': total_got,
+            'start_date': start_date,
+            'end_date': end_date,
         }
         return render(request, 'khata/customer_detail.html', context)
         
@@ -397,41 +367,58 @@ def add_interest(request, b64_id):
     
 @login_required
 def download_ledger_pdf(request, b64_id):
-    # Error aane par program crash hone se bachane ke liye try block
     try:
-        # Base64 string se actual ID nikalne ke liye DecodeBase64 ka logic
-        
+        # Decode base64 ID
         decoded_id_str = base64.b64decode(b64_id).decode('utf-8')
         actual_customer_id = int(decoded_id_str)
         
-        # Grahak aur uski saari transactions fetch karein
+        # Date filters URL se uthayein
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+        
         customer = get_object_or_404(Customer, id=actual_customer_id, user=request.user)
+        
+        # Transactions ko filter ke sath fetch karein
         transactions = Transaction.objects.filter(customer=customer).order_by('date')
         
-        # Totals calculate karein
-        total_given = sum(t.amount for t in transactions if t.trans_type == 'GIVEN')
-        total_got = sum(t.amount for t in transactions if t.trans_type == 'GOT')
+        if start_date and end_date:
+            transactions = transactions.filter(date__range=[start_date, end_date])
+            
+        # Running Balance aur Totals calculation
+        running_balance = 0
+        total_given = 0
+        total_got = 0
+        
+        for t in transactions:
+            if t.trans_type == 'GIVEN':
+                running_balance += t.amount
+                total_given += t.amount
+            else:
+                running_balance -= t.amount
+                total_got += t.amount
+            t.running_balance = running_balance
+            
         net_balance = total_given - total_got
         
-        # Template ko data pass karne ke liye context banayein
+        # Template Context
         context = {
             'customer': customer,
             'transactions': transactions,
             'net_balance': net_balance,
             'total_given': total_given,
             'total_got': total_got,
+            'start_date': start_date,
+            'end_date': end_date,
         }
         
-        # PDF template load karein
+        # PDF Generate Logic
         template_path = 'khata/pdf_template.html'
         template = get_template(template_path)
         html = template.render(context)
         
-        # HTTP response ko PDF format ke liye set karein
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="Hisaab_{customer.name}.pdf"'
         
-        # HTML se PDF banayein
         pisa_status = pisa.CreatePDF(html, dest=response)
         
         if pisa_status.err:
@@ -441,12 +428,8 @@ def download_ledger_pdf(request, b64_id):
         return response
         
     except Exception as e:
-        # Koi bhi unexpected error handle karein
         messages.error(request, f"PDF report nikalne me samasya: {str(e)}")
         return redirect('dashboard')
-    
-# khata/views.py ke aakhir me ye view jodein
-from .models import ShopProfile
 
 @login_required
 def shop_profile(request):
