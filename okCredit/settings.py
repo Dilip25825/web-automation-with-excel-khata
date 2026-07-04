@@ -118,7 +118,7 @@ LOGIN_REDIRECT_URL = 'dashboard'
 LOGIN_URL = 'login'
 LOGOUT_URL = 'login'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-SESSION_COOKIE_AGE = 600
+# SESSION_COOKIE_AGE = 600
 # settings.py
 SESSION_ENGINE = 'django.contrib.sessions.backends.file'
 # Ya agar aap chahte hain ki server restart hote hi data delete ho jaye:

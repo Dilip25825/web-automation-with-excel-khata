@@ -175,7 +175,11 @@ def customer_detail(request, customer_id):
     try:
         
         customer = get_object_or_404(Customer, id=customer_id, user=request.user)
-        
+        transactions = Transaction.objects.filter(customer=customer).order_by('date')
+    
+        # Totals calculate karein
+        total_given = sum(t.amount for t in transactions if t.trans_type == 'GIVEN')
+        total_got = sum(t.amount for t in transactions if t.trans_type == 'GOT')
         if request.method == 'POST':
             amount = request.POST.get('amount')
             trans_type = request.POST.get('trans_type')
@@ -274,6 +278,8 @@ def customer_detail(request, customer_id):
             'encoded_id': encoded_id,
             'auto_months': auto_months,
             'whatsapp_url': whatsapp_url,
+            'total_given': total_given,
+            'total_got': total_got,
         }
         return render(request, 'khata/customer_detail.html', context)
         
