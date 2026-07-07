@@ -41,27 +41,31 @@
             {% if user.is_authenticated %}
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'dashboard' %}">🏠 Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'report_page' %}">📊 Report</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'shop_profile' %}">⚙️ Settings</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'task_list' %}">
-                             📋 Next Tasks
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <form action="{% url 'logout' %}" method="POST" class="d-inline">
-                            {% csrf_token %}
-                            <button type="submit" class="nav-link btn btn-link text-white">🔒 Logout</button>
-                        </form>
-                    </li>
-                </ul>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'dashboard' %}">🏠 Dashboard</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'report_page' %}">📊 Report</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'shop_profile' %}">⚙️ Settings</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'task_list' %}">📋 Next Tasks</a>
+    </li>
+    <li class="nav-item">
+        <form action="{% url 'logout' %}" method="POST" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="nav-link btn btn-link text-white">🔒 Logout</button>
+        </form>
+    </li>
+    <!-- Yeh raha correction: span ko li tag ke andar daalein -->
+    <li class="nav-item d-flex align-items-center">
+        <span class="text-white small ms-2"> 
+            Logged in: <strong class="text-white">👤 {{request.user.username}}</strong>
+        </span>
+    </li>
+</ul>
             </div>
             {% endif %}
         </div>
