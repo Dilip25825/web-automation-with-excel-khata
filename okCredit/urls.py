@@ -21,6 +21,7 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('khata.urls')),
+    path('tasks/', include('task_manager.urls')),
     
     # In-built Login aur Logout views
     path('login/', auth_views.LoginView.as_view(template_name='khata/login.html'), name='login'),

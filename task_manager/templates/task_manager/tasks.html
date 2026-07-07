@@ -1,0 +1,101 @@
+{% extends 'khata/base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm p-4 border-0">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="text-success"><i class="bi bi-list-check"></i> My Daily Tasks</h4>
+            <button type="button" class="btn btn-success" onclick="openAddModal()">
+                <i class="bi bi-plus-lg"></i> Add New Task
+            </button>
+        </div>
+
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Sr</th>
+                    <th>Task</th>
+                    <th>Category</th>
+                    <th>Due Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks %}
+                <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td class="{% if task.is_completed %}text-decoration-line-through text-muted{% endif %}">
+                        {{ task.title }}
+                    </td>
+                    <td><span class="badge bg-secondary">{{ task.get_category_display }}</span></td>
+                    <td>{{ task.due_date|date:"d M Y" }}</td>
+                    <td>
+                        <a href="{% url 'complete_task' task.id %}" class="btn btn-sm btn-outline-success"><i
+                                class="bi bi-check2"></i></a>
+
+                        <!-- Edit Button: Data attributes ka use karna zyada safe aur clean hai -->
+                        <button type="button" class="btn btn-sm btn-outline-warning"
+                            onclick="editTask('{{ task.id }}', '{{ task.title|escapejs }}', '{{ task.category }}', '{{ task.due_date|date:'Y-m-d'}}')">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+
+                        <a href="{% url 'delete_task' task.id %}" class="btn btn-sm btn-outline-danger"><i
+                                class="bi bi-trash"></i></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="taskModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="POST" id="taskForm" action="{% url 'task_list' %}">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Add New Task</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" name="title" id="id_title" class="form-control mb-3" placeholder="Task Name"
+                        required>
+                    <select name="category" id="id_category" class="form-select mb-3">
+                        <option value="ERP">ERP</option>
+                        <option value="KRP">KRP</option>
+                        <option value="Utility">Utility</option>
+                    </select>
+                    <input type="date" name="due_date" id="id_date" class="form-control" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Save Task</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Global modal variable
+    var taskModal = new bootstrap.Modal(document.getElementById('taskModal'));
+
+    // Add task ke liye function
+    function openAddModal() {
+        document.getElementById('taskForm').reset();
+        document.getElementById('taskForm').action = "{% url 'task_list' %}"; // Ensure ye URL aapke Add logic par point kare
+        document.getElementById('modalTitle').innerText = "Add New Task";
+        taskModal.show();
+    }
+
+    // Edit task ke liye function
+    function editTask(id, title, cat, date) {
+        document.getElementById('taskForm').action = "/tasks/edit/" + id + "/"; // Yahan correct edit URL path dein
+        document.getElementById('id_title').value = title;
+        document.getElementById('id_category').value = cat;
+        document.getElementById('id_date').value = date;
+        document.getElementById('modalTitle').innerText = "Edit Task";
+        taskModal.show();
+    }
+</script>
+{% endblock %}

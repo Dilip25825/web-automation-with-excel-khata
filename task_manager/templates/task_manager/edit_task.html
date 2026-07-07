@@ -1,0 +1,20 @@
+<!-- task_manager/templates/task_manager/edit_task.html -->
+{% extends 'khata/base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow p-4">
+        <h4>Edit Task</h4>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="text" name="title" class="form-control mb-2" value="{{ task.title }}">
+            <select name="category" class="form-select mb-2">
+                <option value="ERP" {% if task.category == 'BANK' %}selected{% endif %}>ERP</option>
+                <option value="KRP" {% if task.category == 'AGRI' %}selected{% endif %}>KRP</option>
+                <option value="Utility" {% if task.category == 'AGRI' %}selected{% endif %}>Utility</option>
+            </select>
+            <input type="date" name="due_date" class="form-control mb-2" value="{{ task.due_date|date:'Y-m-d' }}">
+            <button type="submit" class="btn btn-success">Update</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

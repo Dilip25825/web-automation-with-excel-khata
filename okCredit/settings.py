@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'khata',
     'django.contrib.humanize',
+    'task_manager'
 ]
 
 MIDDLEWARE = [

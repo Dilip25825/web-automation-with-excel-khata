@@ -7,13 +7,13 @@ from django.utils.dateparse import parse_date
 from django.db.models import Q
 from django.utils import timezone
 import urllib.parse
-# khata/views.py ke sabse upar jodein
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from django.http import HttpResponse
 from .models import ShopProfile
 from django.core.paginator import Paginator #
 
+                 
 
 @login_required
 def dashboard(request):

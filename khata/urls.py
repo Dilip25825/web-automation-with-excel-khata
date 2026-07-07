@@ -19,4 +19,5 @@ urlpatterns = [
     path('settings/', views.shop_profile, name='shop_profile'),
     path('report/', views.report_page, name='report_page'),
     path('customer/<str:customer_id>/', views.customer_detail, name='customer_detail'),
+    
 ]
